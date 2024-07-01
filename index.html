@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>勞工權益冒險記</title>
+    <style>
+        body {
+            font-family: 'Microsoft JhengHei', '微軟正黑體', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        .scenario {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        .question {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .options {
+            margin-bottom: 10px;
+        }
+        .option {
+            display: block;
+            margin-bottom: 5px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .feedback {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        .progress {
+            background-color: #ddd;
+            height: 20px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+        }
+        .progress-bar {
+            height: 100%;
+            background-color: #4CAF50;
+            width: 0%;
+            border-radius: 10px;
+            transition: width 0.5s;
+        }
+    </style>
+</head>
+<body>
+    <h1>勞工權益冒險記</h1>
+    <p>歡迎來到 Gogoro 電動機車公司！作為新進白領員工小明，你將在這裡學習重要的勞工權益知識。完成所有任務，成為勞工權益達人吧！</p>
+    
+    <div class="progress">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <div id="scenarioContainer"></div>
+
+    <script>
+        const scenarios = [
+            {
+                question: "你發現公司到了每月15號還沒發薪水，HR告訴你公司資金周轉有問題，可能要延後發放。你該怎麼辦？",
+                options: [
+                    "默默等待，相信公司會盡快處理",
+                    "向勞工局申訴，要求公司依法按時發放薪資",
+                    "跟同事討論，一起向主管反應",
+                    "直接辭職，找新工作"
+                ],
+                correctAnswer: 1,
+                feedback: "正確！根據勞基法第22條，工資應全額直接給付勞工。第23條規定，工資之給付，每月至少定期發給二次。你有權利要求公司按時發放薪資，必要時可向勞工局申訴。"
+            },
+            {
+                question: "你的主管要求你連續加班到很晚，並說這是公司文化。這樣合法嗎？",
+                options: [
+                    "合法，只要公司付加班費就可以",
+                    "不合法，勞基法有規定最長工作時間",
+                    "看情況，如果是緊急任務就可以",
+                    "不確定，但既然是主管要求，應該沒問題"
+                ],
+                correctAnswer: 1,
+                feedback: "正確！根據勞基法第32條，正常工作時間連同延長工作時間，一日不得超過12小時。每月延長工作時間不得超過46小時。過度加班是不合法的。"
+            },
+            {
+                question: "你想申請特休，但主管說公司很忙，要你延後。這樣對嗎？",
+                options: [
+                    "對的，公司忙碌時不應該請特休",
+                    "不對，特休是法定權益，不能被剝奪",
+                    "可以商量，看能不能換個時間休",
+                    "算了，不休也沒關係"
+                ],
+                correctAnswer: 1,
+                feedback: "正確！根據勞基法第38條，特別休假是勞工的法定權益。第39條規定，特別休假期間工資應由雇主照給。公司不能以忙碌為由拒絕你的特休申請。"
+            }
+        ];
+
+        let currentScenario = 0;
+        let score = 0;
+
+        function displayScenario() {
+            const scenario = scenarios[currentScenario];
+            let html = `
+                <div class="scenario">
+                    <div class="question">${scenario.question}</div>
+                    <div class="options">
+                        ${scenario.options.map((option, index) => `
+                            <label class="option">
+                                <input type="radio" name="answer" value="${index}">
+                                ${option}
+                            </label>
+                        `).join('')}
+                    </div>
+                    <button onclick="checkAnswer()">提交答案</button>
+                    <div class="feedback" id="feedback"></div>
+                </div>
+            `;
+            document.getElementById('scenarioContainer').innerHTML = html;
+        }
+
+        function checkAnswer() {
+            const selectedAnswer = document.querySelector('input[name="answer"]:checked');
+            if (!selectedAnswer) {
+                alert('請選擇一個答案！');
+                return;
+            }
+            const answerIndex = parseInt(selectedAnswer.value);
+            const scenario = scenarios[currentScenario];
+            const feedbackElement = document.getElementById('feedback');
+            
+            if (answerIndex === scenario.correctAnswer) {
+                feedbackElement.textContent = '答對了！' + scenario.feedback;
+                feedbackElement.style.color = 'green';
+                score++;
+            } else {
+                feedbackElement.textContent = '答錯了。' + scenario.feedback;
+                feedbackElement.style.color = 'red';
+            }
+
+            currentScenario++;
+            updateProgress();
+
+            if (currentScenario < scenarios.length) {
+                setTimeout(displayScenario, 3000);
+            } else {
+                setTimeout(showFinalResult, 3000);
+            }
+        }
+
+        function updateProgress() {
+            const progressBar = document.getElementById('progressBar');
+            const progress = (currentScenario / scenarios.length) * 100;
+            progressBar.style.width = `${progress}%`;
+        }
+
+        function showFinalResult() {
+            let resultHtml = `
+                <h2>遊戲結束！</h2>
+                <p>你總共答對了 ${score} 題，獲得了 ${score} 個勞工權益徽章！</p>
+            `;
+            if (score === scenarios.length) {
+                resultHtml += '<p>恭喜你成為勞工權益達人！</p>';
+            } else {
+                resultHtml += '<p>繼續學習，相信你下次一定能成為勞工權益達人！</p>';
+            }
+            resultHtml += '<button onclick="restartGame()">重新開始</button>';
+            document.getElementById('scenarioContainer').innerHTML = resultHtml;
+        }
+
+        function restartGame() {
+            currentScenario = 0;
+            score = 0;
+            updateProgress();
+            displayScenario();
+        }
+
+        displayScenario();
+    </script>
+</body>
+</html>
